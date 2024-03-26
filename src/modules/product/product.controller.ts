@@ -1,7 +1,8 @@
 import { ProductService } from './product.service';
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { ProductDto } from './dto/product-dto';
+import { StockDto } from './dto/stock-dto';
 
 @Controller('api/v1/products')
 @ApiTags('productos')
@@ -33,4 +34,18 @@ export class ProductController {
     updateProduct(@Body() produc: ProductDto){
         return  this.productService.updateProducto(produc); 
     }
+
+    @Delete('/:id')
+    deleteProduct(@Param('id') id: number){
+        return this.productService.softDelete(id);
+    }
+    @Patch('/restore/:id') //SIMILAR A UN PUT
+    restoreProduct(@Param('id')id:number){
+        return this.productService.restoreProduct(id);
+    }
+    @Patch('/stock')
+    updateStock(@Body() stock:StockDto){
+        return this.productService.updateStock(stock);
+    }
+
 }
