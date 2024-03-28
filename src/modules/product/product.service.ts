@@ -8,6 +8,10 @@ import { StockDto } from './dto/stock-dto';
 @Injectable()
 export class ProductService {
 
+    private MIN_STOCK: number = 0;
+    private MAX_STOCK: number = 1000;
+
+
     constructor(@InjectRepository(Product) private productRepository: Repository<Product>){}
 
     async createProduct(product: ProductDto){
@@ -82,5 +86,64 @@ export class ProductService {
 
     async updateStock(s: StockDto){
         const produc: ProductDto = await this.findProduct(s.id);
+        if (!produc){
+            throw new ConflictException(`El Producto ${s.id} no esta existe`);
+        }
+        if (produc.deleted){
+            throw new ConflictException(`El Producto ${s.id} no esta borrado`);
+        }
+        const rows: UpdateResult= await this.productRepository.update(
+            {id: s.id}, 
+            {stock: s.stock}
+        );
+
+        return rows.affected == 1;
+    }
+
+
+    async incrementStock(s: StockDto){
+        const produc: ProductDto = await this.findProduct(s.id);
+        if (!produc){
+            throw new ConflictException(`El Producto ${s.id} no esta existe`);
+        }
+        if (produc.deleted){
+            throw new ConflictException(`El Producto ${s.id} no esta borrado`);
+        }
+
+        let stock = 0;
+        if(s.stock + produc.stock > this.MAX_STOCK){
+            stock =this.MAX_STOCK;
+        }else{
+            stock = s.stock + produc.stock
+        }
+        const rows: UpdateResult= await this.productRepository.update(
+            {id: s.id}, 
+            {stock}
+        );
+
+        return rows.affected == 1;
+    }
+
+    async decrementStock(s: StockDto){
+        const produc: ProductDto = await this.findProduct(s.id);
+        if (!produc){
+            throw new ConflictException(`El Producto ${s.id} no esta existe`);
+        }
+        if (produc.deleted){
+            throw new ConflictException(`El Producto ${s.id} no esta borrado`);
+        }
+
+        let stock = 0;
+        if(produc.stock - s.stock  > this.MIN_STOCK){
+            stock =this.MIN_STOCK;
+        }else{
+            stock = produc.stock - s.stock 
+        }
+        const rows: UpdateResult= await this.productRepository.update(
+            {id: s.id}, 
+            {stock}
+        );
+
+        return rows.affected == 1;
     }
 }
