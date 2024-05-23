@@ -1,6 +1,6 @@
 import { ProductService } from './product.service';
 import { Body, Controller, Delete, Get, Param, Patch, Post, Put } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ProductDto } from './dto/product-dto';
 import { StockDto } from './dto/stock-dto';
 
@@ -36,6 +36,14 @@ export class ProductController {
                     
         }
     })
+    @ApiResponse({
+        status:201,
+        description: 'El producto se ha creado correctamente'
+    })
+    @ApiResponse({
+        status:409,
+        description: 'El producto existe'
+    })
     createProduct(@Body() product: ProductDto){
         return this.productService.createProduct(product);
     }
@@ -43,6 +51,10 @@ export class ProductController {
     @Get()
     @ApiOperation({
         description: 'Obtener todos los productos no borrados'
+    })
+    @ApiResponse({
+        status:200,
+        description: 'Devuelve la información, solicitada'
     })
     getProduct(){
        return  this.productService.findAll(); 
@@ -52,6 +64,11 @@ export class ProductController {
     @ApiOperation({
         description: 'Obtener todos los productos borrados'
     })   
+
+    @ApiResponse({
+        status:200,
+        description: 'Devuelve la información, solicitada'
+    })
     getProductDeleted(){
        return  this.productService.findAllDeleted(); 
     }
@@ -65,6 +82,10 @@ export class ProductController {
         description:'id del producto',
         required: true,
         type: Number
+    })
+    @ApiResponse({
+        status:200,
+        description: 'Devuelve la información, solicitada'
     })
     getProductById(@Param('id') id:number){
        return  this.productService.findProduct(id); 
@@ -89,6 +110,11 @@ export class ProductController {
                     
         }
     })
+
+    @ApiResponse({
+        status:200,
+        description: 'Devuelve ha actualizado correctamente'
+    })
     updateProduct(@Body() produc: ProductDto){
         return  this.productService.updateProducto(produc); 
     }
@@ -103,6 +129,18 @@ export class ProductController {
         required: true,
         type: Number
     })
+
+    @ApiResponse({
+        status:200,
+        description: 'Se ha borrado correctamente'
+    })
+
+    @ApiResponse({
+        status:409,
+        description: 
+        `El producto no existe. <br/>
+         El producto esta ya borrado`
+    })
     deleteProduct(@Param('id') id: number){
         return this.productService.softDelete(id);
     }
@@ -111,11 +149,24 @@ export class ProductController {
     @ApiOperation({
         description: 'Recupera un producto por ID'
     })
+
     @ApiParam({
         name:'id',
         description:'id del producto',
         required: true,
         type: Number
+    })
+
+    @ApiResponse({
+        status:200,
+        description: 'Se ha restaurado correctamente'
+    })
+
+    @ApiResponse({
+        status:409,
+        description: 
+        `El producto no existe. <br/>
+         El producto no esta borrado`
     })
     restoreProduct(@Param('id')id:number){
         return this.productService.restoreProduct(id);
@@ -137,6 +188,18 @@ export class ProductController {
                 },
                     
         }
+    })
+
+    @ApiResponse({
+        status:200,
+        description: 'Se ha actualizado el stock correctamente'
+    })
+
+    @ApiResponse({
+        status:409,
+        description: 
+        `El producto no existe. <br/>
+         El producto esta borrado`
     })
     updateStock(@Body() stock:StockDto){
         return this.productService.updateStock(stock);
@@ -165,6 +228,18 @@ export class ProductController {
             },       
         }
     })
+
+    @ApiResponse({
+        status:200,
+        description: 'Se ha incrementado el stock correctamente'
+    })
+
+    @ApiResponse({
+        status:409,
+        description: 
+        `El producto no existe. <br/>
+         El producto esta borrado`
+    })
     incrementStock(@Body() stock:StockDto){
         return this.productService.incrementStock(stock);
     }
@@ -191,6 +266,18 @@ export class ProductController {
                 }  
             },       
         }
+    })
+
+    @ApiResponse({
+        status:200,
+        description: 'Se ha actualizado el stock correctamente'
+    })
+
+    @ApiResponse({
+        status:409,
+        description: 
+        `El producto no existe. <br/>
+         El producto esta borrado`
     })
     decrementStock(@Body() stock:StockDto){
         return this.productService.decrementStock(stock);
